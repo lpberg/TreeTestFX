@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,46 +28,51 @@ import javafx.stage.FileChooser;
 public class FXMLDocumentController {
     
     @FXML
-    private Label filepath;
+    private Label filePathLabel;
     
     @FXML
-    private Button fileChooseBtn;
-    
-    @FXML
-    private TreeView nodes;
-    
-    private ArrayList<String> nodesFromFile = new ArrayList<String>();
-    
+    private TreeView myTreeView;
+
     @FXML
     private void fileChooserDialog(ActionEvent event) throws Exception {
         FileChooser fc = new FileChooser();
         File selectedFile = fc.showOpenDialog(null);
-        filepath.setText(selectedFile.getName());
+        filePathLabel.setText(selectedFile.getName());
         readInFile(selectedFile.getAbsolutePath());
-        createTreeView();
     }
    
-    public void readInFile(String filename) throws Exception {
+    private void readInFile(String filename) throws Exception {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
         String line;
-        
+        TreeItem<String> root = new TreeItem<>("root");
+        myTreeView.showRootProperty().set(false);
         while ((line = bufferedReader.readLine()) != null)
         {
-           System.out.println(line);
-           nodesFromFile.add(line);         
+           String[] splitLine = line.split("\\s*,\\s*");
+           addNodeFromString(root,splitLine);         
         }
-        bufferedReader.close();                
+        bufferedReader.close();
+        myTreeView.setRoot(root);
+    }   
+    
+    private int getIndexbyValue(TreeItem<String> parent,String val){
+        for(TreeItem<String> child : parent.getChildren()){
+            if(val.equals(child.getValue())){
+                return parent.getChildren().indexOf(child);
+            }
+        }
+        return -1;        
     }
     
-    public void createTreeView(){
-        TreeItem<String> root = new TreeItem<>("root");
-        TreeItem<String> a = new TreeItem<>("a");
-        TreeItem<String> b = new TreeItem<>("b");
-        TreeItem<String> c = new TreeItem<>("c");
-        root.getChildren().add(a);
-        a.getChildren().add(b);
-        b.getChildren().add(c);
-        nodes.setRoot(root);
-        nodes.showRootProperty().set(false);
+    private void addNodeFromString(TreeItem<String> parent, String[] splitLine){
+        String nodeName = splitLine[0];
+        if (splitLine.length < 2) {
+            parent.getChildren().add(new TreeItem<>(nodeName));
+        } else {                 
+            int indexOfChild = getIndexbyValue(parent,nodeName);
+            TreeItem<String> newParent = parent.getChildren().get(indexOfChild);
+            String[] subset = Arrays.copyOfRange(splitLine, 1, splitLine.length);
+            addNodeFromString(newParent,subset);
+        }  
     }
 }

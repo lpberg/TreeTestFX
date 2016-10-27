@@ -8,21 +8,15 @@ package javafxtext;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.ResourceBundle;
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 
 /**
@@ -30,39 +24,88 @@ import javafx.stage.FileChooser;
  * @author lpberg
  */
 public class FXMLDocumentController {
-    
     @FXML
-    private Label filePathLabel;
-    
+    private Button nextTaskBtn, prevTaskBtn;
+    @FXML
+    private Label treeFilePathLabel;
+    @FXML
+    private Label taskFilePathLabel;
+    @FXML
+    private Label taskDescriptionLabel;
     @FXML
     public TreeView myTreeView;
-    
+    public ArrayList<String> taskList;
     TreeItem<String> root;
-
+    
     @FXML
-    private void fileChooserDialog(ActionEvent event) throws Exception {
+    private void resetEventHandler(ActionEvent event) throws Exception {
+        root.getChildren().stream().forEach((child) -> {
+            colapseAllTreeItems(child);
+        });
+    }
+    @FXML
+    private void treeFileEventHandler(ActionEvent event) throws Exception {
+        String path = fileChooserDialog();
+        treeFilePathLabel.setText(path);
+        readInTreeFile(path);
+    }    
+    @FXML
+    private void taskFileEventHandler(ActionEvent event) throws Exception {
+        String path = fileChooserDialog();
+        taskFilePathLabel.setText(path);
+        readInTaskFile(path);
+    }
+    @FXML
+    private void nextTaskEventHandler(ActionEvent event) throws Exception {
+        int nextTaskIdx;
+        int currentTaskIdx = taskList.indexOf(taskDescriptionLabel.getText());
+        if (currentTaskIdx == taskList.size()-1){
+            nextTaskIdx = 0;
+        } else {
+            nextTaskIdx = currentTaskIdx + 1;
+        }
+        taskDescriptionLabel.setText(taskList.get(nextTaskIdx));            
+    }
+    @FXML
+    private void previousTaskEventHandler(ActionEvent event) throws Exception {
+        int previousTaskIdx;
+        int currentTaskIdx = taskList.indexOf(taskDescriptionLabel.getText());
+        if (currentTaskIdx == 0){
+            previousTaskIdx = taskList.size()-1;
+        } else {
+            previousTaskIdx = currentTaskIdx - 1;
+        }
+        taskDescriptionLabel.setText(taskList.get(previousTaskIdx));
+    }
+    private String fileChooserDialog(){
         FileChooser fc = new FileChooser();
         File selectedFile = fc.showOpenDialog(null);
-        filePathLabel.setText(selectedFile.getName());
-        readInFile(selectedFile.getAbsolutePath());
+        return selectedFile.getAbsolutePath();
     }
-   
-    private void readInFile(String filename) throws Exception {
+    private void readInTreeFile(String filename) throws Exception {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
         String line;
         root = new TreeItem<>("root");
+        myTreeView.setRoot(root);
         myTreeView.showRootProperty().set(false);
         while ((line = bufferedReader.readLine()) != null)
         {
-           String[] splitLine = line.split("\\s*,\\s*");
-           addNodeFromString(root,splitLine);         
+           addTreeItemToTreeViewFromString(root,line.split("\\s*,\\s*"));         
         }
-        bufferedReader.close();
-        myTreeView.setRoot(root);
-        makeOnlyOneChildExpandableAtATime(root);
+        bufferedReader.close();        
+        //enableChildrenExpansionMutuallyExclusive(root);
     }   
-    
-    private int getIndexbyValue(TreeItem<String> parent,String val){
+    private void readInTaskFile(String filename) throws Exception {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
+        String line;
+        taskList = new ArrayList<>();
+        while ((line = bufferedReader.readLine()) != null) {taskList.add(line);}
+        bufferedReader.close();
+        taskDescriptionLabel.setText(taskList.get(0));
+        nextTaskBtn.setDisable(false);
+        prevTaskBtn.setDisable(false);
+    }  
+    private int getTreeItemIndexbyStringValue(TreeItem<String> parent,String val){
         for(TreeItem<String> child : parent.getChildren()){
             if(val.equals(child.getValue())){
                 return parent.getChildren().indexOf(child);
@@ -70,29 +113,18 @@ public class FXMLDocumentController {
         }
         return -1;        
     }
-    
-    private void addNodeFromString(TreeItem<String> parent, String[] splitLine){
+    private void addTreeItemToTreeViewFromString(TreeItem<String> parent, String[] splitLine){
         String nodeName = splitLine[0];
         if (splitLine.length < 2) {
             parent.getChildren().add(new TreeItem<>(nodeName));
         } else {                 
-            int indexOfChild = getIndexbyValue(parent,nodeName);
+            int indexOfChild = getTreeItemIndexbyStringValue(parent,nodeName);
             TreeItem<String> newParent = parent.getChildren().get(indexOfChild);
             String[] subset = Arrays.copyOfRange(splitLine, 1, splitLine.length);
-            addNodeFromString(newParent,subset);
+            addTreeItemToTreeViewFromString(newParent,subset);
         }  
     }
-    /*@FXML
-    private void mouseClicked(MouseEvent mouseEvent){
-        TreeItem<String> item = (TreeItem<String>) myTreeView.getSelectionModel().getSelectedItem();
-        String selectedItem = item.getValue();
-        //System.out.println(selectedItem);
-        for (TreeItem<String> child : root.getChildren()){
-            if(true){
-                //System.out.println(child.getValue());
-            }
-        }*/
-    private void makeOnlyOneChildExpandableAtATime(TreeItem<String> parent){
+    private void enableChildrenExpansionMutuallyExclusive(TreeItem<String> parent){
         for (TreeItem<String> child : parent.getChildren()){
             child.expandedProperty().addListener((Observable observable) -> {
                 if (child.isExpanded()) {
@@ -105,4 +137,11 @@ public class FXMLDocumentController {
             });
         }
     }
+    private void colapseAllTreeItems(TreeItem<String> parent){
+        parent.setExpanded(false);
+        parent.getChildren().stream().forEach((child) -> {
+            colapseAllTreeItems(child);
+        });
     }
+}
+        

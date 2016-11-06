@@ -3,18 +3,23 @@ package javafxtext;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.FileChooser;
 
-public class FXMLDocumentController {
+public class FXMLDocumentController implements Initializable {
     @FXML
     private Button nextTaskBtn, prevTaskBtn, resetBtn;
     @FXML
@@ -46,7 +51,7 @@ public class FXMLDocumentController {
     }
     @FXML
     private void nextOrPrevTaskEventHandler(ActionEvent event) throws Exception {
-        int setTask = 0;
+        int setTask;
         int currentTaskIdx = taskList.indexOf(taskDescriptionLabel.getText());
         //see if the button clicked is the "next task" button, else, its the previous task button
         if (((Button) event.getSource()).getText().equals("New Task")){
@@ -119,6 +124,26 @@ public class FXMLDocumentController {
         parent.getChildren().stream().forEach((child) -> {
             colapseAllTreeItems(child);
         });
+    }
+    private String  getPathToItem(TreeItem<String> child){
+        if (child.getParent() != null){
+            return getPathToItem(child.getParent())+" | "+child.getValue();
+        }
+        return "";
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+       myTreeView.getSelectionModel().selectedItemProperty()
+            .addListener(new ChangeListener<TreeItem<String>>() {
+                @Override
+                public void changed(
+                    ObservableValue<? extends TreeItem<String>> observable,
+                    TreeItem<String> old_val, TreeItem<String> new_val) {
+                    TreeItem<String> selectedItem = new_val;
+                    //System.out.println("Selected Node Path : " + getPathToItem(selectedItem));
+                }
+            });
     }
 }
         

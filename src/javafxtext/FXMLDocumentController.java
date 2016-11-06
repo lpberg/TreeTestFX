@@ -25,13 +25,9 @@ import javafx.stage.FileChooser;
  */
 public class FXMLDocumentController {
     @FXML
-    private Button nextTaskBtn, prevTaskBtn;
+    private Button nextTaskBtn, prevTaskBtn, resetBtn;
     @FXML
-    private Label treeFilePathLabel;
-    @FXML
-    private Label taskFilePathLabel;
-    @FXML
-    private Label taskDescriptionLabel;
+    private Label treeFilePathLabel,  taskFilePathLabel, taskDescriptionLabel;
     @FXML
     public TreeView myTreeView;
     public ArrayList<String> taskList;
@@ -56,26 +52,21 @@ public class FXMLDocumentController {
         readInTaskFile(path);
     }
     @FXML
-    private void nextTaskEventHandler(ActionEvent event) throws Exception {
-        int nextTaskIdx;
+    private void nextOrPrevTaskEventHandler(ActionEvent event) throws Exception {
+        int setTask = 0;
         int currentTaskIdx = taskList.indexOf(taskDescriptionLabel.getText());
-        if (currentTaskIdx == taskList.size()-1){
-            nextTaskIdx = 0;
-        } else {
-            nextTaskIdx = currentTaskIdx + 1;
+        //Switch on the name of the button.
+        switch (((Button) event.getSource()).getText()) {
+            case "Next Task" :
+                setTask = (currentTaskIdx == taskList.size()-1) ? 0 : currentTaskIdx + 1;
+                break;   
+            case "Prev Task": 
+                setTask = (currentTaskIdx == 0) ? taskList.size() - 1 : currentTaskIdx - 1;
+            default: 
+                break;
         }
-        taskDescriptionLabel.setText(taskList.get(nextTaskIdx));            
-    }
-    @FXML
-    private void previousTaskEventHandler(ActionEvent event) throws Exception {
-        int previousTaskIdx;
-        int currentTaskIdx = taskList.indexOf(taskDescriptionLabel.getText());
-        if (currentTaskIdx == 0){
-            previousTaskIdx = taskList.size()-1;
-        } else {
-            previousTaskIdx = currentTaskIdx - 1;
-        }
-        taskDescriptionLabel.setText(taskList.get(previousTaskIdx));
+        taskDescriptionLabel.setText(taskList.get(setTask));
+        
     }
     private String fileChooserDialog(){
         FileChooser fc = new FileChooser();
@@ -83,24 +74,25 @@ public class FXMLDocumentController {
         return selectedFile.getAbsolutePath();
     }
     private void readInTreeFile(String filename) throws Exception {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
-        String line;
-        root = new TreeItem<>("root");
-        myTreeView.setRoot(root);
-        myTreeView.showRootProperty().set(false);
-        while ((line = bufferedReader.readLine()) != null)
-        {
-           addTreeItemToTreeViewFromString(root,line.split("\\s*,\\s*"));         
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            root = new TreeItem<>("root");
+            myTreeView.setRoot(root);
+            myTreeView.showRootProperty().set(false);
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                addTreeItemToTreeViewFromString(root,line.split("\\s*,\\s*"));
+            }
         }
-        bufferedReader.close();        
+        resetBtn.setDisable(false);
         //enableChildrenExpansionMutuallyExclusive(root);
     }   
     private void readInTaskFile(String filename) throws Exception {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
-        String line;
-        taskList = new ArrayList<>();
-        while ((line = bufferedReader.readLine()) != null) {taskList.add(line);}
-        bufferedReader.close();
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            taskList = new ArrayList<>();
+            while ((line = bufferedReader.readLine()) != null) {taskList.add(line);}
+        }
         taskDescriptionLabel.setText(taskList.get(0));
         nextTaskBtn.setDisable(false);
         prevTaskBtn.setDisable(false);
@@ -125,17 +117,15 @@ public class FXMLDocumentController {
         }  
     }
     private void enableChildrenExpansionMutuallyExclusive(TreeItem<String> parent){
-        for (TreeItem<String> child : parent.getChildren()){
+        parent.getChildren().stream().forEach((child) -> {
             child.expandedProperty().addListener((Observable observable) -> {
                 if (child.isExpanded()) {
-                    for (TreeItem<String> thisChild : parent.getChildren()){
-                        if(!child.equals(thisChild)){
-                            thisChild.setExpanded(false);
-                        }
-                    }
+                    parent.getChildren().stream().filter((thisChild) -> (!child.equals(thisChild))).forEach((thisChild) -> {
+                        thisChild.setExpanded(false);
+                    });
                 }
             });
-        }
+        });
     }
     private void colapseAllTreeItems(TreeItem<String> parent){
         parent.setExpanded(false);

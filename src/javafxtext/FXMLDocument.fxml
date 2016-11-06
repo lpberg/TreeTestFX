@@ -32,16 +32,16 @@
          <font>
             <Font size="18.0" />
          </font></Label>
-      <Button fx:id="nextTaskBtn" disable="true" layoutX="421.0" layoutY="83.0" mnemonicParsing="false" onAction="#nextTaskEventHandler" prefHeight="21.0" prefWidth="65.0" text="Next Task">
+      <Button fx:id="nextTaskBtn" disable="true" layoutX="421.0" layoutY="83.0" mnemonicParsing="false" onAction="#nextOrPrevTaskEventHandler" prefHeight="21.0" prefWidth="65.0" text="Next Task">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
-      <Button fx:id="prevTaskBtn" disable="true" layoutX="258.0" layoutY="83.0" mnemonicParsing="false" onAction="#previousTaskEventHandler" prefHeight="21.0" prefWidth="65.0" text="Prev Task">
+      <Button fx:id="prevTaskBtn" disable="true" layoutX="258.0" layoutY="83.0" mnemonicParsing="false" onAction="#nextOrPrevTaskEventHandler" prefHeight="21.0" prefWidth="65.0" text="Prev Task">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
-      <Button fx:id="reset" layoutX="346.0" layoutY="78.0" mnemonicParsing="false" onAction="#resetEventHandler" prefHeight="21.0" prefWidth="53.0" text="Reset" />
+      <Button fx:id="resetBtn" disable="true" layoutX="346.0" layoutY="78.0" mnemonicParsing="false" onAction="#resetEventHandler" prefHeight="21.0" prefWidth="53.0" text="Reset" />
     </children>
 </AnchorPane>

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package javafxtext;
 
 import java.io.BufferedReader;
@@ -19,10 +14,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.FileChooser;
 
-/**
- *
- * @author lpberg
- */
 public class FXMLDocumentController {
     @FXML
     private Button nextTaskBtn, prevTaskBtn, resetBtn;
@@ -30,7 +21,9 @@ public class FXMLDocumentController {
     private Label treeFilePathLabel,  taskFilePathLabel, taskDescriptionLabel;
     @FXML
     public TreeView myTreeView;
+    
     public ArrayList<String> taskList;
+    
     TreeItem<String> root;
     
     @FXML
@@ -55,18 +48,13 @@ public class FXMLDocumentController {
     private void nextOrPrevTaskEventHandler(ActionEvent event) throws Exception {
         int setTask = 0;
         int currentTaskIdx = taskList.indexOf(taskDescriptionLabel.getText());
-        //Switch on the name of the button.
-        switch (((Button) event.getSource()).getText()) {
-            case "Next Task" :
-                setTask = (currentTaskIdx == taskList.size()-1) ? 0 : currentTaskIdx + 1;
-                break;   
-            case "Prev Task": 
-                setTask = (currentTaskIdx == 0) ? taskList.size() - 1 : currentTaskIdx - 1;
-            default: 
-                break;
+        //see if the button clicked is the "next task" button, else, its the previous task button
+        if (((Button) event.getSource()).getText().equals("New Task")){
+            setTask = (currentTaskIdx == taskList.size()-1) ? 0 : currentTaskIdx + 1;
+        } else {
+             setTask = (currentTaskIdx == 0) ? taskList.size() - 1 : currentTaskIdx - 1;
         }
-        taskDescriptionLabel.setText(taskList.get(setTask));
-        
+        taskDescriptionLabel.setText(taskList.get(setTask));   
     }
     private String fileChooserDialog(){
         FileChooser fc = new FileChooser();
@@ -85,7 +73,6 @@ public class FXMLDocumentController {
             }
         }
         resetBtn.setDisable(false);
-        //enableChildrenExpansionMutuallyExclusive(root);
     }   
     private void readInTaskFile(String filename) throws Exception {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filename))) {

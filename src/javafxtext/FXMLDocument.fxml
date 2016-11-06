@@ -2,46 +2,52 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane id="AnchorPane" prefHeight="663.0" prefWidth="617.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxtext.FXMLDocumentController">
     <children>
-        <Button fx:id="chooseFileBtn" layoutX="31.0" layoutY="115.0" onAction="#treeFileEventHandler" text="Choose File..." />
-      <Label fx:id="treeFilePathLabel" alignment="TOP_LEFT" layoutX="32.0" layoutY="153.0" prefHeight="48.0" prefWidth="167.0" text="No file selected." textFill="#00000096" wrapText="true" />
-      <TreeView fx:id="myTreeView" layoutX="258.0" layoutY="182.0" prefHeight="465.0" prefWidth="228.0" />
-      <Label layoutX="30.0" layoutY="80.0" text="1. Select a tree file.">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="30.0" layoutY="24.0" text="TreeTestFX" textFill="#2121a4bd">
-         <font>
-            <Font size="31.0" />
-         </font>
-      </Label>
-      <Button fx:id="chooseTaskFileBtn" layoutX="32.0" layoutY="245.0" onAction="#taskFileEventHandler" text="Choose File..." />
-      <Label fx:id="taskFilePathLabel" alignment="TOP_LEFT" layoutX="30.0" layoutY="284.0" prefHeight="48.0" prefWidth="167.0" text="No file selected." textFill="#00000096" wrapText="true" />
-      <Label layoutX="31.0" layoutY="210.0" text="2. Select task a file.">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <Label fx:id="taskDescriptionLabel" alignment="BOTTOM_LEFT" layoutX="258.0" layoutY="114.0" prefHeight="62.0" prefWidth="228.0" style="-fx-background-color: lightgray;" wrapText="true">
+      <Label fx:id="treeFilePathLabel" alignment="TOP_LEFT" layoutX="17.0" layoutY="58.0" prefHeight="21.0" prefWidth="464.0" text="No file selected." textFill="#00000096" wrapText="true" />
+      <TreeView fx:id="myTreeView" layoutX="17.0" layoutY="184.0" prefHeight="465.0" prefWidth="587.0" />
+      <Label fx:id="taskFilePathLabel" alignment="TOP_LEFT" layoutX="17.0" layoutY="35.0" prefHeight="21.0" prefWidth="353.0" text="No file selected." textFill="#00000096" wrapText="true" />
+      <Label fx:id="taskDescriptionLabel" alignment="BOTTOM_LEFT" layoutX="17.0" layoutY="145.0" prefHeight="36.0" prefWidth="587.0" wrapText="true">
          <font>
             <Font size="18.0" />
          </font></Label>
-      <Button fx:id="nextTaskBtn" disable="true" layoutX="421.0" layoutY="83.0" mnemonicParsing="false" onAction="#nextOrPrevTaskEventHandler" prefHeight="21.0" prefWidth="65.0" text="Next Task">
+      <Button fx:id="nextTaskBtn" disable="true" layoutX="539.0" layoutY="118.0" mnemonicParsing="false" onAction="#nextOrPrevTaskEventHandler" prefHeight="21.0" prefWidth="65.0" text="Next Task">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
-      <Button fx:id="prevTaskBtn" disable="true" layoutX="258.0" layoutY="83.0" mnemonicParsing="false" onAction="#nextOrPrevTaskEventHandler" prefHeight="21.0" prefWidth="65.0" text="Prev Task">
+      <Button fx:id="prevTaskBtn" disable="true" layoutX="17.0" layoutY="118.0" mnemonicParsing="false" onAction="#nextOrPrevTaskEventHandler" prefHeight="21.0" prefWidth="65.0" text="Prev Task">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
-      <Button fx:id="resetBtn" disable="true" layoutX="346.0" layoutY="78.0" mnemonicParsing="false" onAction="#resetEventHandler" prefHeight="21.0" prefWidth="53.0" text="Reset" />
+      <Button fx:id="resetBtn" disable="true" layoutX="551.0" layoutY="43.0" mnemonicParsing="false" onAction="#resetEventHandler" prefHeight="21.0" prefWidth="53.0" text="Reset" />
+      <MenuBar layoutX="1.0" prefHeight="21.0" prefWidth="617.0" AnchorPane.topAnchor="0.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#treeFileEventHandler" text="Open a Tree File" />
+                  <MenuItem mnemonicParsing="false" onAction="#taskFileEventHandler" text="Open a Task File" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
     </children>
 </AnchorPane>
